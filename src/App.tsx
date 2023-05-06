@@ -1,57 +1,50 @@
-import HelpScout, { NOTIFICATION_TYPES } from "@helpscout/javascript-sdk";
+import HelpScout, { NOTIFICATION_TYPES, ConfirmNotificationOptions } from "@helpscout/javascript-sdk";
 import { Button, DefaultStyle, Heading, Icon } from "@helpscout/ui-kit";
 import { useEffect, useState, useRef } from "react";
-import { Octokit } from "@octokit/core";
+import { Octokit, Repository } from "@octokit/core";
 import DropList from "@hsds/drop-list";
 
+interface Repository {
+	id: number;
+	full_name: string;
+	has_issues: boolean;
+}
+
+interface DropListItem {
+	id: string;
+	value: string;
+}
+
 function App() {
-	const [userEmail, setUserEmail] = useState<string | undefined>("unknown user");
-	const [issues, setIssues] = useState<any[]>([]); // TODO: type this as [Octokit.IssuesListForRepoResponseItem]
-	const octokit = useRef(new Octokit({ auth: process.env.ACCESS_TOKEN }));
+	const [repos, setRepos] = useState<Repository[]>([]);
+	const octokit = useRef<Octokit>(new Octokit({ auth: import.meta.env.VITE_GH_ACCESS_TOKEN }));
 
 	useEffect(() => {
-		const searchIssues = async () => {
-			return await octokit.current.request("GET /search/issues", {
-				q: "repo:rikkitissier/helpscout-example is:issue is:open",
-			});
+		const userRepos = async () => {
+			return await octokit.current.request("GET /user/repos");
 		};
 
-		searchIssues().then((response) => setIssues(response.data.items));
+		userRepos().then((response) => {
+			const reposToList = response.data.filter((repo: Repository) => repo.has_issues);
+			setRepos(reposToList);
+		});
 	}, []);
 
-	useEffect(() => {
-		HelpScout.getApplicationContext().then(({ user }) => setUserEmail(user?.email));
-	}, []);
+	const handleOnSelectRepo = (selected: DropListItem) => {
+    HelpScout.getConfirmNotificationConfirmed().then((confirmed) => {
+      console.log(confirmed)
+    })
 
-	function onClick() {
-		HelpScout.showNotification(NOTIFICATION_TYPES.SUCCESS, "Hello from the sidebar app");
-	}
+		HelpScout.showNotification(NOTIFICATION_TYPES.CONFIRM, "Create new issue?", {
+			body: `Are you sure you want to link this conversation to a new issue in <strong>${selected.value}</strong>?`,
+		} as ConfirmNotificationOptions);
+	};
 
 	return (
 		<div className="App">
 			<DefaultStyle />
 
-			<DropList
-				toggler={<Button size="sm" />}
-				items={[
-					{ id: "1", value: "One" },
-					{ id: "2", value: "Two" },
-					{ id: "3", value: "Three" },
-				]}
-			/>
-
-			<Heading level="h4">Hi, {userEmail}</Heading>
-			<br />
-			<Button size="sm" onClick={onClick}>
-				<Icon name="plus" />
-			</Button>
-
-			{issues.map((issue) => (
-				<div key={issue.id}>
-					<h1>{issue.title}</h1>
-					<p>{issue.body}</p>
-				</div>
-			))}
+			<DropList autoSetComboboxAt={10} inputPlaceholder="Choose repo..." toggler={<Button>Create an issue</Button>} items={repos.map((repo) => ({ id: repo.id.toString(), value: repo.full_name }))} onSelect={handleOnSelectRepo} />
 		</div>
 	);
 }
