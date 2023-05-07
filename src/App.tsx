@@ -7,6 +7,8 @@ import { useEffect, useState, useRef } from "react";
 import { Octokit } from "@octokit/core";
 import DropList from "@hsds/drop-list";
 
+import "./App.css";
+
 interface Repository {
   id: number;
   full_name: string;
@@ -32,7 +34,9 @@ function App() {
 
   useEffect(() => {
     const userRepos = async () => {
-      return await octokit.current.request("GET /user/repos");
+      return await octokit.current.request(
+        "GET /user/repos?affiliation=owner&per_page=100"
+      );
     };
 
     userRepos().then((response) => {
@@ -65,7 +69,7 @@ function App() {
         autoSetComboboxAt={10}
         inputPlaceholder="Choose repo..."
         toggler={
-          <Button style={{ width: "100%" }} theme="grey" styled="outlined">
+          <Button className="cButton--fullWidth" theme="grey" styled="outlined">
             Create an issue
           </Button>
         }
