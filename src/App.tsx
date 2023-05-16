@@ -25,12 +25,7 @@ function App() {
   const octokit = useRef<Octokit>(
     new Octokit({ auth: import.meta.env.VITE_GH_ACCESS_TOKEN })
   );
-
-  useEffect(() => {
-    window.addEventListener("message", function onMessage(event) {
-      console.log(event.origin);
-    });
-  }, []);
+  const urlSearchParams = new URLSearchParams(window.location.search);
 
   useEffect(() => {
     const userRepos = async () => {
@@ -40,7 +35,7 @@ function App() {
     };
 
     userRepos().then((response) => {
-      const reposToList = response.data.filter(
+      const reposToList: Repository[] = response.data.filter(
         (repo: Repository) => repo.has_issues
       );
       setRepos(reposToList);
@@ -48,18 +43,32 @@ function App() {
   }, []);
 
   const handleOnSelectRepo = (selected: DropListItem) => {
-    HelpScout.getConfirmNotificationConfirmed().then((confirmed) => {
-      console.log(confirmed);
-    });
-
-    HelpScout.showNotification(
-      NOTIFICATION_TYPES.CONFIRM,
-      "Create new issue?",
-      {
-        body: `Are you sure you want to link this conversation to a new issue in ${selected.value}?`,
-      } as ConfirmNotificationOptions
+    window.open(
+      window.location.href + `?repo=${selected.value}`,
+      "_blank",
+      "popup,width=1000,height=700,location=no"
     );
   };
+
+  console.log(JSON.stringify(urlSearchParams.values()));
+
+  if (urlSearchParams.has("repo")) {
+    return (
+      <div className="App">
+        <DefaultStyle />
+        <Heading size="lg">Create an issue</Heading>
+        {urlSearchParams.get("repo")}
+        <Button
+          className="cButton--fullWidth"
+          theme="grey"
+          styled="outlined"
+          onClick={() => {}}
+        >
+          Create Issue
+        </Button>
+      </div>
+    );
+  }
 
   return (
     <div className="App">
