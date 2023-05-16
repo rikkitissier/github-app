@@ -1,11 +1,9 @@
-import HelpScout, {
-  NOTIFICATION_TYPES,
-  ConfirmNotificationOptions,
-} from "@helpscout/javascript-sdk";
 import { Button, DefaultStyle, Heading, Icon } from "@helpscout/ui-kit";
 import { useEffect, useState, useRef } from "react";
 import { Octokit } from "@octokit/core";
 import DropList from "@hsds/drop-list";
+
+import CreateIssuePopup from "./components/CreateIssuePopup";
 
 import "./App.css";
 
@@ -20,7 +18,7 @@ interface DropListItem {
   value: string;
 }
 
-function App() {
+function App(): JSX.Element {
   const [repos, setRepos] = useState<Repository[]>([]);
   const octokit = useRef<Octokit>(
     new Octokit({ auth: import.meta.env.VITE_GH_ACCESS_TOKEN })
@@ -50,24 +48,8 @@ function App() {
     );
   };
 
-  console.log(JSON.stringify(urlSearchParams.values()));
-
   if (urlSearchParams.has("repo")) {
-    return (
-      <div className="App">
-        <DefaultStyle />
-        <Heading size="lg">Create an issue</Heading>
-        {urlSearchParams.get("repo")}
-        <Button
-          className="cButton--fullWidth"
-          theme="grey"
-          styled="outlined"
-          onClick={() => {}}
-        >
-          Create Issue
-        </Button>
-      </div>
-    );
+    return <CreateIssuePopup />;
   }
 
   return (

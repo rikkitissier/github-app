@@ -1,3 +1,7 @@
+:root {
+  --appBgColor: #f1f3f5;
+}
+
 .cButton--fullWidth {
   width: 100%;
 }
