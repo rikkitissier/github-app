@@ -1,7 +1,4 @@
-import HelpScout, {
-  NOTIFICATION_TYPES,
-  ConfirmNotificationOptions,
-} from "@helpscout/javascript-sdk";
+import HelpScout, { NOTIFICATION_TYPES, ConfirmNotificationOptions } from "@helpscout/javascript-sdk";
 import { Button, DefaultStyle, Heading, Icon } from "@helpscout/ui-kit";
 import { useEffect, useState, useRef } from "react";
 import { Octokit } from "@octokit/core";
@@ -10,77 +7,69 @@ import DropList from "@hsds/drop-list";
 import "./App.css";
 
 interface Repository {
-  id: number;
-  full_name: string;
-  has_issues: boolean;
+	id: number;
+	full_name: string;
+	has_issues: boolean;
 }
 
 interface DropListItem {
-  id: string;
-  value: string;
+	id: string;
+	value: string;
 }
 
 function App() {
-  const [repos, setRepos] = useState<Repository[]>([]);
-  const octokit = useRef<Octokit>(
-    new Octokit({ auth: import.meta.env.VITE_GH_ACCESS_TOKEN })
-  );
+	const [repos, setRepos] = useState<Repository[]>([]);
+	const octokit = useRef<Octokit>(new Octokit({ auth: import.meta.env.VITE_GH_ACCESS_TOKEN }));
+	const urlSearchParams = new URLSearchParams(window.location.search);
 
-  useEffect(() => {
-    window.addEventListener("message", function onMessage(event) {
-      console.log(event.origin);
-    });
-  }, []);
+	useEffect(() => {
+		const userRepos = async () => {
+			return await octokit.current.request("GET /user/repos?affiliation=owner&per_page=100");
+		};
 
-  useEffect(() => {
-    const userRepos = async () => {
-      return await octokit.current.request(
-        "GET /user/repos?affiliation=owner&per_page=100"
-      );
-    };
+		userRepos().then((response) => {
+			const reposToList: Repository[] = response.data.filter((repo: Repository) => repo.has_issues);
+			setRepos(reposToList);
+		});
+	}, []);
 
-    userRepos().then((response) => {
-      const reposToList = response.data.filter(
-        (repo: Repository) => repo.has_issues
-      );
-      setRepos(reposToList);
-    });
-  }, []);
+	const handleOnSelectRepo = (selected: DropListItem) => {
+		window.open(window.location.href + `?repo=${selected.value}`, "_blank", "popup,width=1000,height=700,location=no");
+	};
 
-  const handleOnSelectRepo = (selected: DropListItem) => {
-    HelpScout.getConfirmNotificationConfirmed().then((confirmed) => {
-      console.log(confirmed);
-    });
+	if (urlSearchParams.has("repo")) {
+		return (
+			<div className="App">
+				<DefaultStyle />
+				<Heading size="lg">Create an issue</Heading>
+				{urlSearchParams.get("repo")}
+				<Button className="cButton--fullWidth" theme="grey" styled="outlined" onClick={() => {}}>
+					Create Issue
+				</Button>
+			</div>
+		);
+	}
 
-    HelpScout.showNotification(
-      NOTIFICATION_TYPES.CONFIRM,
-      "Create new issue?",
-      {
-        body: `Are you sure you want to link this conversation to a new issue in ${selected.value}?`,
-      } as ConfirmNotificationOptions
-    );
-  };
+	return (
+		<div className="App">
+			<DefaultStyle />
 
-  return (
-    <div className="App">
-      <DefaultStyle />
-
-      <DropList
-        autoSetComboboxAt={10}
-        inputPlaceholder="Choose repo..."
-        toggler={
-          <Button className="cButton--fullWidth" theme="grey" styled="outlined">
-            Create an issue
-          </Button>
-        }
-        items={repos.map((repo) => ({
-          id: repo.id.toString(),
-          value: repo.full_name,
-        }))}
-        onSelect={handleOnSelectRepo}
-      />
-    </div>
-  );
+			<DropList
+				autoSetComboboxAt={10}
+				inputPlaceholder="Choose repo..."
+				toggler={
+					<Button className="cButton--fullWidth" theme="grey" styled="outlined">
+						Create an issue
+					</Button>
+				}
+				items={repos.map((repo) => ({
+					id: repo.id.toString(),
+					value: repo.full_name,
+				}))}
+				onSelect={handleOnSelectRepo}
+			/>
+		</div>
+	);
 }
 
 export default App;
