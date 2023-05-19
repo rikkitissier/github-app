@@ -5,7 +5,7 @@ import { Octokit } from "@octokit/core";
 import DropList from "@hsds/drop-list";
 import Input from "@hsds/input";
 
-import { PopupBodyUI, PopupBodyStyle, ToolbarUI, SelectTagUI, FormUI, RepoSelectorUI, RepoSelectorLabelUI } from "./CreateIssuePopup.css";
+import { PopupBodyStyle, ToolbarUI, SelectTagUI, FormUI, RepoSelectorUI, RepoSelectorLabelUI } from "./CreateIssuePopup.css";
 
 interface Repository {
 	id: number;

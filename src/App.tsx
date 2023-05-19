@@ -2,6 +2,7 @@ import { Button, DefaultStyle, Heading, Icon } from "@helpscout/ui-kit";
 import { useEffect, useState, useRef } from "react";
 
 import CreateIssuePopup from "./components/CreateIssuePopup";
+import IssueList from "./components/IssueList";
 
 import "./App.css";
 
@@ -23,6 +24,8 @@ function App(): JSX.Element {
 			<Button className="cButton--fullWidth" theme="grey" styled="outlined" onClick={openCreateIssue}>
 				Create an issue
 			</Button>
+
+      <IssueList />
 		</div>
 	);
 }
