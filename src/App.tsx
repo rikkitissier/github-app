@@ -1,77 +1,30 @@
 import { Button, DefaultStyle, Heading, Icon } from "@helpscout/ui-kit";
 import { useEffect, useState, useRef } from "react";
-import { Octokit } from "@octokit/core";
-import DropList from "@hsds/drop-list";
 
 import CreateIssuePopup from "./components/CreateIssuePopup";
 
 import "./App.css";
 
-interface Repository {
-  id: number;
-  full_name: string;
-  has_issues: boolean;
-}
-
-interface DropListItem {
-  id: string;
-  value: string;
-}
-
 function App(): JSX.Element {
-  const [repos, setRepos] = useState<Repository[]>([]);
-  const octokit = useRef<Octokit>(
-    new Octokit({ auth: import.meta.env.VITE_GH_ACCESS_TOKEN })
-  );
-  const urlSearchParams = new URLSearchParams(window.location.search);
+	const urlSearchParams = new URLSearchParams(window.location.search);
 
-  useEffect(() => {
-    const userRepos = async () => {
-      return await octokit.current.request(
-        "GET /user/repos?affiliation=owner&per_page=100"
-      );
-    };
+	const openCreateIssue = (): void => {
+		window.open(window.location.href + `?do=createIssue`, "_blank", "popup,width=1000,height=700,location=no");
+	};
 
-    userRepos().then((response) => {
-      const reposToList: Repository[] = response.data.filter(
-        (repo: Repository) => repo.has_issues
-      );
-      setRepos(reposToList);
-    });
-  }, []);
+	if (urlSearchParams.has("do") && urlSearchParams.get("do") === "createIssue") {
+		return <CreateIssuePopup />;
+	}
 
-  const handleOnSelectRepo = (selected: DropListItem) => {
-    window.open(
-      window.location.href + `?repo=${selected.value}`,
-      "_blank",
-      "popup,width=1000,height=700,location=no"
-    );
-  };
+	return (
+		<div className="App">
+			<DefaultStyle />
 
-  if (urlSearchParams.has("repo")) {
-    return <CreateIssuePopup />;
-  }
-
-  return (
-    <div className="App">
-      <DefaultStyle />
-
-      <DropList
-        autoSetComboboxAt={10}
-        inputPlaceholder="Choose repo..."
-        toggler={
-          <Button className="cButton--fullWidth" theme="grey" styled="outlined">
-            Create an issue
-          </Button>
-        }
-        items={repos.map((repo) => ({
-          id: repo.id.toString(),
-          value: repo.full_name,
-        }))}
-        onSelect={handleOnSelectRepo}
-      />
-    </div>
-  );
+			<Button className="cButton--fullWidth" theme="grey" styled="outlined" onClick={openCreateIssue}>
+				Create an issue
+			</Button>
+		</div>
+	);
 }
 
 export default App;
