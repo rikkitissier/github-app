@@ -1,32 +1,29 @@
-import { Button, DefaultStyle, Heading, Icon } from "@helpscout/ui-kit";
-import { useEffect, useState, useRef } from "react";
+import { useRef } from "react";
+import { Octokit } from "@octokit/core";
 
-import CreateIssuePopup from "./components/CreateIssuePopup";
-import IssueList from "./components/IssueList";
+import { Main, CreateIssuePopup } from "./screens";
+import { OctokitContext } from "./hooks/useOctokitContext";
 
 import "./App.css";
 
 function App(): JSX.Element {
+	const octokit = useRef<Octokit>(new Octokit({ auth: import.meta.env.VITE_GH_ACCESS_TOKEN }));
 	const urlSearchParams = new URLSearchParams(window.location.search);
 
-	const openCreateIssue = (): void => {
-		window.open(window.location.href + `?do=createIssue`, "_blank", "popup,width=1000,height=700,location=no");
-	};
-
-	if (urlSearchParams.has("do") && urlSearchParams.get("do") === "createIssue") {
-		return <CreateIssuePopup />;
-	}
+  // Veeeery naive 'routing' so we can open the app in popup windows
+  const renderScreen = () => {
+    switch (urlSearchParams.get("do")) {
+      case "createIssue":
+        return <CreateIssuePopup />;
+      default:
+        return <Main />;
+    }
+  }
 
 	return (
-		<div className="App">
-			<DefaultStyle />
-
-			<Button className="cButton--fullWidth" theme="grey" styled="outlined" onClick={openCreateIssue}>
-				Create an issue
-			</Button>
-
-      <IssueList />
-		</div>
+		<OctokitContext.Provider value={octokit}>
+			{renderScreen()}
+		</OctokitContext.Provider>
 	);
 }
 

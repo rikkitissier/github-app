@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef } from "react";
-import { Button, DefaultStyle, Heading, Icon } from "@helpscout/ui-kit";
 import { Octokit } from "@octokit/core";
+
+import { useOctokitContext } from "../../../../hooks/useOctokitContext";
 
 interface Repository {
 	id: number;
@@ -10,11 +11,11 @@ interface Repository {
 
 const IssueList = (): JSX.Element => {
 	const [repos, setRepos] = useState<Repository[]>([]);
-	const octokit = useRef<Octokit>(new Octokit({ auth: import.meta.env.VITE_GH_ACCESS_TOKEN }));
+	const octokit = useOctokitContext();
 
 	useEffect(() => {
 		const issues = async () => {
-			return await octokit.current.request(`GET /search/issues?q=${encodeURIComponent("test is:issue user:rikkitissier")}`);
+			return await octokit!.current.request(`GET /search/issues?q=${encodeURIComponent("test is:issue user:rikkitissier")}`);
 		};
 
 		issues().then((response) => {

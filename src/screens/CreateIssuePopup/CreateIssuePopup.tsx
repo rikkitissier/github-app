@@ -1,10 +1,11 @@
 import { useEffect, useState, useRef } from "react";
 import { Button, DefaultStyle, Heading, Icon } from "@helpscout/ui-kit";
 import SimpleModal, { HeaderAndFooter } from "@hsds/simple-modal";
-import { Octokit } from "@octokit/core";
 import DropList from "@hsds/drop-list";
 import Input from "@hsds/input";
+import Checkbox from "@hsds/checkbox";
 
+import { useOctokitContext } from "../../hooks/useOctokitContext";
 import { PopupBodyStyle, ToolbarUI, SelectTagUI, FormUI, RepoSelectorUI, RepoSelectorLabelUI } from "./CreateIssuePopup.css";
 
 interface Repository {
@@ -20,11 +21,14 @@ interface DropListItem {
 
 const CreateIssuePopup = (): JSX.Element => {
 	const [repos, setRepos] = useState<Repository[]>([]);
-	const octokit = useRef<Octokit>(new Octokit({ auth: import.meta.env.VITE_GH_ACCESS_TOKEN }));
+	const octokit = useOctokitContext();
+	const [selectedRepo, setSelectedRepo] = useState<DropListItem | null>(null);
+	const [bodyContent, setBodyContent] = useState<string>("");
+	const [includeMessage, setIncludeMessage] = useState<boolean>(true);
 
 	useEffect(() => {
 		const userRepos = async () => {
-			return await octokit.current.request("GET /user/repos?affiliation=owner&per_page=100");
+			return await octokit!.current.request("GET /user/repos?affiliation=owner&per_page=100");
 		};
 
 		userRepos().then((response) => {
@@ -32,6 +36,20 @@ const CreateIssuePopup = (): JSX.Element => {
 			setRepos(reposToList);
 		});
 	}, []);
+
+	const submitIssue = () => {
+		window.opener.postMessage(
+			{
+				type: "createIssue",
+				data: {
+					repo: selectedRepo?.value,
+					body: bodyContent,
+					includeMessage,
+				},
+			},
+			"*"
+		);
+	};
 
 	return (
 		<>
@@ -46,7 +64,7 @@ const CreateIssuePopup = (): JSX.Element => {
 							<Button onClick={() => {}} styled="linked" theme="grey">
 								Cancel
 							</Button>
-							<Button onClick={() => {}} theme="blue" size="lg">
+							<Button onClick={submitIssue} theme="blue" size="lg">
 								Create Issue
 							</Button>
 						</ToolbarUI>
@@ -54,19 +72,21 @@ const CreateIssuePopup = (): JSX.Element => {
 				>
 					<FormUI>
 						<RepoSelectorUI>
-							<RepoSelectorLabelUI>Repository</RepoSelectorLabelUI>
 							<DropList
 								autoSetComboboxAt={10}
 								inputPlaceholder="Choose repo..."
-								toggler={<SelectTagUI placeholder="Select repo..." />}
+								toggler={<SelectTagUI text={selectedRepo?.value || "Select repo..."} />}
 								items={repos.map((repo) => ({
 									id: repo.id.toString(),
 									value: repo.full_name,
 								}))}
-								onSelect={() => {}}
+								onSelect={(selection: DropListItem) => {
+									setSelectedRepo(selection);
+								}}
 							/>
 						</RepoSelectorUI>
-						<Input multiline={20} placeholder="Enter some information about this issue" />
+						<Input multiline={16} value={bodyContent} onChange={(value: string) => setBodyContent(value)} placeholder="Enter some information about this issue" />
+						<Checkbox label="Include original message in issue body" checked={includeMessage} onChange={() => setIncludeMessage(!includeMessage)} />
 					</FormUI>
 				</HeaderAndFooter>
 			</SimpleModal>
