@@ -5,30 +5,21 @@ import DropList from "@hsds/drop-list";
 import Input from "@hsds/input";
 import Checkbox from "@hsds/checkbox";
 
+import type { CreateIssuePayload, Repository, DropListItem } from "../../types";
+
 import { useOctokitContext } from "../../hooks/useOctokitContext";
 import { PopupBodyStyle, ToolbarUI, SelectTagUI, FormUI, RepoSelectorUI, RepoSelectorLabelUI } from "./CreateIssuePopup.css";
 
-interface Repository {
-	id: number;
-	full_name: string;
-	has_issues: boolean;
-}
-
-interface DropListItem {
-	id: string;
-	value: string;
-}
-
 const CreateIssuePopup = (): JSX.Element => {
-	const [repos, setRepos] = useState<Repository[]>([]);
 	const octokit = useOctokitContext();
+	const [repos, setRepos] = useState<Repository[]>([]);
 	const [selectedRepo, setSelectedRepo] = useState<DropListItem | null>(null);
 	const [bodyContent, setBodyContent] = useState<string>("");
 	const [includeMessage, setIncludeMessage] = useState<boolean>(true);
 
 	useEffect(() => {
 		const userRepos = async () => {
-			return await octokit!.current.request("GET /user/repos?affiliation=owner&per_page=100");
+			return await octokit!.request("GET /user/repos?affiliation=owner&per_page=100");
 		};
 
 		userRepos().then((response) => {
@@ -41,11 +32,11 @@ const CreateIssuePopup = (): JSX.Element => {
 		window.opener.postMessage(
 			{
 				type: "createIssue",
-				data: {
+				payload: {
 					repo: selectedRepo?.value,
 					body: bodyContent,
 					includeMessage,
-				},
+				} as CreateIssuePayload,
 			},
 			"*"
 		);

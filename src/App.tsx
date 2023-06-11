@@ -21,7 +21,7 @@ function App(): JSX.Element {
   }
 
 	return (
-		<OctokitContext.Provider value={octokit}>
+		<OctokitContext.Provider value={octokit.current}>
 			{renderScreen()}
 		</OctokitContext.Provider>
 	);
