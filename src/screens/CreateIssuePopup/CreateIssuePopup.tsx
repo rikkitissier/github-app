@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from "react";
-import { Button, DefaultStyle, Heading, Icon } from "@helpscout/ui-kit";
+import { Button } from "@helpscout/ui-kit";
 import SimpleModal, { HeaderAndFooter } from "@hsds/simple-modal";
 import DropList from "@hsds/drop-list";
 import Input from "@hsds/input";
@@ -28,6 +28,10 @@ const CreateIssuePopup = (): JSX.Element => {
 		});
 	}, []);
 
+	const closePopup = () => {
+		window.close();
+	}
+
 	const submitIssue = () => {
 		window.opener.postMessage(
 			{
@@ -44,7 +48,6 @@ const CreateIssuePopup = (): JSX.Element => {
 
 	return (
 		<>
-			<DefaultStyle />
 			<PopupBodyStyle />
 			<SimpleModal show width="calc(100% - 100px)" height="calc(100% - 100px)" withCloseButton={false}>
 				<HeaderAndFooter
@@ -52,7 +55,7 @@ const CreateIssuePopup = (): JSX.Element => {
 					heading="Create GitHub Issue"
 					footer={
 						<ToolbarUI>
-							<Button onClick={() => {}} styled="linked" theme="grey">
+							<Button onClick={closePopup} styled="linked" theme="grey">
 								Cancel
 							</Button>
 							<Button onClick={submitIssue} theme="blue" size="lg">

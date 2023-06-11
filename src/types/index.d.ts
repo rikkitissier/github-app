@@ -1,4 +1,4 @@
-export interface CreateIssuePayload = {
+export interface CreateIssuePayload {
 	repo: string;
 	body: string;
 	includeMessage: boolean;
