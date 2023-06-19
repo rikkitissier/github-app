@@ -58,7 +58,7 @@ const CreateIssuePopup = (): JSX.Element => {
 							<Button onClick={closePopup} styled="linked" theme="grey">
 								Cancel
 							</Button>
-							<Button onClick={submitIssue} theme="blue" size="lg">
+							<Button onClick={submitIssue} theme="blue" size="md">
 								Create Issue
 							</Button>
 						</ToolbarUI>

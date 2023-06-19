@@ -9,8 +9,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@helpscout/javascript-sdk": "^0.1.0",
-    "@helpscout/ui-kit": "^0.1.0",
+    "@helpscout/javascript-sdk": "^0.2.3",
+    "@helpscout/ui-kit": "^0.6.0",
     "@hsds/checkbox": "^7.1.10",
     "@hsds/drop-list": "^7.3.1",
     "@hsds/input": "^7.1.10",
