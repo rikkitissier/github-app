@@ -1,4 +1,6 @@
+// @ts-ignore
 import styled, { createGlobalStyle } from "styled-components";
+// @ts-ignore
 import { SelectTag } from "@hsds/drop-list";
 
 export const PopupBodyStyle = createGlobalStyle`

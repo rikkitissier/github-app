@@ -4,7 +4,7 @@ const useMessageListener = (eventType: string, handler: Function) => {
 	useEffect(() => {
 		window.addEventListener("message", handleMessage);
 		return () => window.removeEventListener("message", handleMessage);
-	}, []);
+	}, [handler]);
 
   const handleMessage = (event: MessageEvent) => {
     if( event.data.type === eventType ) {
