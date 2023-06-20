@@ -17,14 +17,17 @@ function App(): JSX.Element {
   const urlSearchParams = new URLSearchParams(window.location.search);
   const [helpscoutContext, setHelpscoutContext] = useState({} as Context);
 
-  useEffect(() => {
-    const getContext = async () => {
-      const context = await HelpScout.getApplicationContext();
-      setHelpscoutContext(context);
-    };
+  HelpScout.getApplicationContext().then((context) => {
+    console.log(context)
+  })
+  // useEffect(() => {
+  //   const getContext = async () => {
+  //     const context = await HelpScout.getApplicationContext();
+  //     setHelpscoutContext(context);
+  //   };
 
-    getContext();
-  }, []);
+  //   getContext();
+  // }, []);
 
   // Veeeery naive 'routing' so we can open the app in popup windows
   const renderScreen = () => {
