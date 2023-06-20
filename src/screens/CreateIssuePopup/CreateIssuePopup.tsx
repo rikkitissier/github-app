@@ -1,8 +1,12 @@
 import { useEffect, useState, useRef } from "react";
 import { Button } from "@helpscout/ui-kit";
+// @ts-ignore
 import SimpleModal, { HeaderAndFooter } from "@hsds/simple-modal";
+// @ts-ignore
 import DropList from "@hsds/drop-list";
+// @ts-ignore
 import Input from "@hsds/input";
+// @ts-ignore
 import Checkbox from "@hsds/checkbox";
 
 import type { CreateIssuePayload, Repository, DropListItem } from "../../types";
